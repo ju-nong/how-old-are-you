@@ -31,7 +31,30 @@ function mathDateOfAngle(angle: number): number {
 }
 
 const PickerContainer = styled.div`
-    display: flex;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        & > h3 {
+            position: relative;
+
+            &::before {
+                content: "지구를 움직여보세요!";
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                transform: translateX(110%);
+                color: #999;
+                font-size: 0.75rem;
+            }
+        }
+    }
 `;
 
 function BirthdayPicker() {
@@ -222,23 +245,26 @@ function BirthdayPicker() {
 
     return (
         <PickerContainer>
-            <span>
-                <input
-                    type="date"
-                    defaultValue={birthday.format("YYYY-MM-DD")}
-                    ref={$input}
-                    onChange={handleChangeData}
-                />
-            </span>
-            <canvas
-                id="slider"
-                width={canvasSize.width}
-                height={canvasSize.height}
-                ref={$canvas}
-                onMouseUp={() => setIsDown(false)}
-                onMouseDown={() => setIsDown(true)}
-                onMouseMove={handleMouseMove}
-            ></canvas>
+            <div>
+                <h3>오 생일이 어떻게 되세요?</h3>
+                <span>
+                    <input
+                        type="date"
+                        defaultValue={birthday.format("YYYY-MM-DD")}
+                        ref={$input}
+                        onChange={handleChangeData}
+                    />
+                </span>
+                <canvas
+                    id="slider"
+                    width={canvasSize.width}
+                    height={canvasSize.height}
+                    ref={$canvas}
+                    onMouseUp={() => setIsDown(false)}
+                    onMouseDown={() => setIsDown(true)}
+                    onMouseMove={handleMouseMove}
+                ></canvas>
+            </div>
         </PickerContainer>
     );
 }
