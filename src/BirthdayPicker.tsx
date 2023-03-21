@@ -1,7 +1,15 @@
-import { useState, useRef, useEffect, MouseEvent, ChangeEvent } from "react";
+import {
+    useState,
+    useRef,
+    useEffect,
+    MouseEvent,
+    ChangeEvent,
+    TouchEvent,
+} from "react";
 import dayjs, { Dayjs } from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 import styled from "@emotion/styled";
+import isMobile from "./utils/isMobile";
 
 dayjs.extend(dayOfYear);
 
@@ -59,10 +67,8 @@ const PickerContainer = styled.div`
         }
 
         & > span {
-            & > input {
-                background-color: transparent;
-                transition: color 0.3s;
-            }
+            margin-top: 0.5rem;
+            transition: color 0.3s;
         }
 
         canvas {
@@ -85,9 +91,7 @@ const PickerContainer = styled.div`
             }
 
             & > span {
-                & > input {
-                    color: #fff;
-                }
+                color: #fff;
             }
         }
 
@@ -102,7 +106,7 @@ interface PickerProps {
 }
 
 function BirthdayPicker({ onIsDown }: PickerProps) {
-    const $input = useRef<HTMLInputElement>(null);
+    const mobile = isMobile();
     const [birthday, setBirthday] = useState<Dayjs>(dayjs());
 
     const $canvas = useRef<HTMLCanvasElement>(null);
@@ -226,7 +230,7 @@ function BirthdayPicker({ onIsDown }: PickerProps) {
     }
 
     function handleMouseMove(event: MouseEvent<HTMLCanvasElement>) {
-        if (isDown) {
+        if (isDown && !mobile) {
             const { offsetX, offsetY } = event.nativeEvent;
 
             const dx = offsetX - sliderConfig.centerX;
@@ -235,6 +239,25 @@ function BirthdayPicker({ onIsDown }: PickerProps) {
             setSliderConfig((config) => ({
                 ...config,
                 angle: Math.atan2(dy, dx),
+            }));
+
+            drawSlider();
+        }
+    }
+
+    function handleTouchMove(event: TouchEvent<HTMLCanvasElement>) {
+        event.preventDefault();
+        if (mobile) {
+            const { left, top } = event.currentTarget.getBoundingClientRect();
+
+            const { clientX, clientY } = event.touches[0];
+
+            const offsetX = clientX - left - sliderConfig.centerX;
+            const offsetY = clientY - top - sliderConfig.centerY;
+
+            setSliderConfig((config) => ({
+                ...config,
+                angle: Math.atan2(offsetY, offsetX),
             }));
 
             drawSlider();
@@ -282,12 +305,6 @@ function BirthdayPicker({ onIsDown }: PickerProps) {
         }
     }, [$canvas, sliderConfig.ctx]);
 
-    useEffect(() => {
-        if ($input.current) {
-            $input.current.value = birthday.format("YYYY-MM-DD");
-        }
-    }, [birthday]);
-
     const [spaceShow, setSpaceShow] = useState(false);
 
     useEffect(() => {
@@ -299,14 +316,7 @@ function BirthdayPicker({ onIsDown }: PickerProps) {
         <PickerContainer className={`${spaceShow ? "show" : ""}`}>
             <div>
                 <h3>오 생일이 어떻게 되세요?</h3>
-                <span>
-                    <input
-                        type="date"
-                        defaultValue={birthday.format("YYYY-MM-DD")}
-                        ref={$input}
-                        onChange={handleChangeData}
-                    />
-                </span>
+                <span>{birthday.format("YYYY-MM-DD")}</span>
                 <canvas
                     width={canvasSize.width}
                     height={canvasSize.height}
@@ -314,6 +324,9 @@ function BirthdayPicker({ onIsDown }: PickerProps) {
                     onMouseUp={() => setIsDown(false)}
                     onMouseDown={() => setIsDown(true)}
                     onMouseMove={handleMouseMove}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={() => setIsDown(false)}
+                    onTouchStart={() => setIsDown(true)}
                 ></canvas>
             </div>
             <img src="images/space.jpg" />

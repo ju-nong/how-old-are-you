@@ -20,9 +20,9 @@ function App() {
     return (
         <MainContainer>
             <BirthdayPicker onIsDown={handleIsDown}></BirthdayPicker>
-            <span>🚀</span>
+            {/* <span>🚀</span>
             <span>🌠</span>
-            <span>⭐</span>
+            <span>⭐</span> */}
             {isDown && <Flash>✨</Flash>}
         </MainContainer>
     );
