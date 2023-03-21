@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, MouseEvent, ChangeEvent } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import dayOfYear from "dayjs/plugin/dayOfYear";
+import styled from "@emotion/styled";
 
 dayjs.extend(dayOfYear);
 
@@ -28,6 +29,10 @@ function mathAngleOfDate(date: number): number {
 function mathDateOfAngle(angle: number): number {
     return Math.floor(((angle + PI) / (PI * 2)) * 363) + 1;
 }
+
+const PickerContainer = styled.div`
+    display: flex;
+`;
 
 function BirthdayPicker() {
     const $input = useRef<HTMLInputElement>(null);
@@ -137,7 +142,7 @@ function BirthdayPicker() {
             .add(dif, "year")
             .set("month", 0)
             .set("date", 1)
-            .add(mathDateOfAngle(angle) - 1, "day");
+            .add(mathDateOfAngle(angle), "day");
 
         setBirthday(
             birthday
@@ -154,8 +159,10 @@ function BirthdayPicker() {
 
     function handleMouseMove(event: MouseEvent<HTMLCanvasElement>) {
         if (isDown) {
-            const dx = event.clientX - sliderConfig.centerX;
-            const dy = event.clientY - sliderConfig.centerY;
+            const { offsetX, offsetY } = event.nativeEvent;
+
+            const dx = offsetX - sliderConfig.centerX;
+            const dy = offsetY - sliderConfig.centerY;
 
             setSliderConfig((config) => ({
                 ...config,
@@ -214,7 +221,15 @@ function BirthdayPicker() {
     }, [birthday]);
 
     return (
-        <div>
+        <PickerContainer>
+            <span>
+                <input
+                    type="date"
+                    defaultValue={birthday.format("YYYY-MM-DD")}
+                    ref={$input}
+                    onChange={handleChangeData}
+                />
+            </span>
             <canvas
                 id="slider"
                 width={canvasSize.width}
@@ -224,15 +239,7 @@ function BirthdayPicker() {
                 onMouseDown={() => setIsDown(true)}
                 onMouseMove={handleMouseMove}
             ></canvas>
-            <span>
-                <input
-                    type="date"
-                    defaultValue={birthday.format("YYYY-MM-DD")}
-                    ref={$input}
-                    onChange={handleChangeData}
-                />
-            </span>
-        </div>
+        </PickerContainer>
     );
 }
 
