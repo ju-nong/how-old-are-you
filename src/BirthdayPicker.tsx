@@ -35,6 +35,7 @@ const PickerContainer = styled.div`
     height: 100vh;
     display: grid;
     place-items: center;
+    position: relative;
 
     & > div {
         display: flex;
@@ -43,6 +44,7 @@ const PickerContainer = styled.div`
 
         & > h3 {
             position: relative;
+            transition: color 0.3s;
 
             &::before {
                 content: "지구를 움직여보세요!";
@@ -53,6 +55,43 @@ const PickerContainer = styled.div`
                 color: #999;
                 font-size: 0.75rem;
             }
+        }
+
+        & > span {
+            & > input {
+                background-color: transparent;
+                transition: color 0.3s;
+            }
+        }
+
+        canvas {
+            cursor: pointer;
+        }
+    }
+
+    & > img {
+        position: absolute;
+        object-fit: cover;
+        z-index: -1;
+        transition: opacity 0.3s;
+        opacity: 0;
+    }
+
+    &.show {
+        & > div {
+            & > h3 {
+                color: #fff;
+            }
+
+            & > span {
+                & > input {
+                    color: #fff;
+                }
+            }
+        }
+
+        & > img {
+            opacity: 1;
         }
     }
 `;
@@ -116,6 +155,7 @@ function BirthdayPicker() {
             0,
             PI * 2,
         );
+        sliderConfig.ctx.strokeStyle = "#fff";
         sliderConfig.ctx.stroke();
 
         const handleX = centerX + radiusX * Math.cos(angle);
@@ -243,8 +283,14 @@ function BirthdayPicker() {
         }
     }, [birthday]);
 
+    const [spaceShow, setSpaceShow] = useState(false);
+
+    useEffect(() => {
+        setSpaceShow(isDown);
+    }, [isDown]);
+
     return (
-        <PickerContainer>
+        <PickerContainer className={`${spaceShow ? "show" : ""}`}>
             <div>
                 <h3>오 생일이 어떻게 되세요?</h3>
                 <span>
@@ -256,7 +302,6 @@ function BirthdayPicker() {
                     />
                 </span>
                 <canvas
-                    id="slider"
                     width={canvasSize.width}
                     height={canvasSize.height}
                     ref={$canvas}
@@ -265,6 +310,7 @@ function BirthdayPicker() {
                     onMouseMove={handleMouseMove}
                 ></canvas>
             </div>
+            <img src="images/space.jpg" />
         </PickerContainer>
     );
 }
