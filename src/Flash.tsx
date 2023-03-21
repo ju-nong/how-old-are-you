@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 
 const FlashContainer = styled.div`
     position: fixed;
@@ -8,37 +9,64 @@ const FlashContainer = styled.div`
     z-index: -80;
     top: 0;
     left: 0;
+`;
 
-    & > div {
-        position: absolute;
+interface FlashOptions {
+    delay: number;
+    left: number;
+    top: number;
+}
 
-        font-size: 1rem;
-        transform: scale(0);
+const FlashStyled = styled.div<FlashOptions>`
+    position: absolute;
 
-        animation-name: flash;
-        animation-duration: 2s;
-        animation-iteration-count: infinite;
-        animation-delay: 1s;
-    }
+    font-size: 1rem;
+    transform: scale(0);
+
+    animation-name: flash;
+    animation-duration: 2s;
+
+    ${(props) => css`
+        top: ${props.top}%;
+        left: ${props.left}%;
+        animation-delay: ${props.delay}s;
+    `}
 `;
 
 interface FlashProps {
     children: string;
 }
 
+type FlashType = {
+    top: number;
+    left: number;
+    delay: number;
+};
+
 function Flash({ children }: FlashProps) {
-    const [stars, setStars] = useState([1, 2, 3]);
+    const [flashs, setFlashs] = useState<FlashType[]>([]);
 
-    // useEffect(() => {
-    //     setInterval(() => {
+    useEffect(() => {
+        setInterval(() => {
+            const newFlash: FlashType[] = [];
 
-    //     }, 3000)
-    // }, [])
+            for (let i = 0; i < 5; i++) {
+                const top = Math.floor(Math.random() * 100);
+                const left = Math.floor(Math.random() * 100);
+                const delay = Math.floor(Math.random() * 2);
+                newFlash.push({ top, left, delay });
+            }
+
+            setFlashs((flashs) => [...flashs, ...newFlash]);
+        }, 1000);
+    }, []);
 
     return (
         <FlashContainer>
-            {stars.map((_) => (
-                <div>{children}</div>
+            {flashs.map(({ top, left, delay }, index) => (
+                <FlashStyled top={top} left={left} delay={delay} key={index}>
+                    {children}
+                </FlashStyled>
             ))}
         </FlashContainer>
     );
