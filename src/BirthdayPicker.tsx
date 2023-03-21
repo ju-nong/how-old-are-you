@@ -36,6 +36,7 @@ const PickerContainer = styled.div`
     display: grid;
     place-items: center;
     position: relative;
+    overflow: hidden;
 
     & > div {
         display: flex;
@@ -72,7 +73,7 @@ const PickerContainer = styled.div`
     & > img {
         position: absolute;
         object-fit: cover;
-        z-index: -1;
+        z-index: -100;
         transition: opacity 0.3s;
         opacity: 0;
     }
@@ -96,7 +97,11 @@ const PickerContainer = styled.div`
     }
 `;
 
-function BirthdayPicker() {
+interface PickerProps {
+    onIsDown: (down: boolean) => void;
+}
+
+function BirthdayPicker({ onIsDown }: PickerProps) {
     const $input = useRef<HTMLInputElement>(null);
     const [birthday, setBirthday] = useState<Dayjs>(dayjs());
 
@@ -287,6 +292,7 @@ function BirthdayPicker() {
 
     useEffect(() => {
         setSpaceShow(isDown);
+        onIsDown(isDown);
     }, [isDown]);
 
     return (
