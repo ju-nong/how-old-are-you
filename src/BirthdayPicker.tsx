@@ -58,8 +58,11 @@ const PickerContainer = styled.div`
             &::before {
                 content: "지구를 움직여보세요!";
                 position: absolute;
+                width: 100%;
+                text-align: center;
                 bottom: 0;
                 right: 0;
+                text-align: left;
                 transform: translateX(110%);
                 color: #999;
                 font-size: 0.75rem;
@@ -97,6 +100,19 @@ const PickerContainer = styled.div`
 
         & > img {
             opacity: 1;
+        }
+    }
+
+    @media screen and (max-width: 500px) {
+        & > div {
+            > h3 {
+                &::before {
+                    text-align: center;
+                    right: 50%;
+                    bottom: 100%;
+                    transform: translateX(50%);
+                }
+            }
         }
     }
 `;
